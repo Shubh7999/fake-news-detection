@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Fake News Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="card card-small">
+            <div class="topbar">
+                <div class="brand">Fake News Detection</div>
+            </div>
+
+            <div class="content">
+                <h2>Welcome Back</h2>
+                <p class="subtitle">
+                    Sign in to analyze news text and review your previous search history.
+                </p>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" name="username" placeholder="Enter username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" type="password" name="password" placeholder="Enter password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-full">Login</button>
+                </form>
+
+                <p class="footer-note">Demo credentials: admin / 1234</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

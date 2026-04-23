@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake News Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="card">
+            <div class="topbar">
+                <div class="brand">Fake News Detection</div>
+                <div class="top-links">
+                    <a href="/history">History</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+
+            <div class="content">
+                <h2>Analyze News Text</h2>
+                <p class="subtitle">
+                    Paste a news statement below and let the CNN model predict whether it is real or fake.
+                </p>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="news">News Content</label>
+                        <textarea id="news" name="news" placeholder="Enter news text here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Check News</button>
+                </form>
+
+                {% if result %}
+                <div class="result-box">
+                    <h3>Prediction Result</h3>
+
+                    {% if "Real" in result %}
+                        <span class="badge badge-real">{{ result }}</span>
+                    {% else %}
+                        <span class="badge badge-fake">{{ result }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History - Fake News Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="card">
+            <div class="topbar">
+                <div class="brand">Search History</div>
+                <div class="top-links">
+                    <a href="/predict">Prediction</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+
+            <div class="content">
+                <h2>Previous Searches</h2>
+                <p class="subtitle">
+                    Review the news text you have already checked and the model’s output.
+                </p>
+
+                {% if data %}
+                <div class="history-list">
+                    {% for row in data %}
+                    <div class="history-card">
+                        <p><span class="history-label">Text:</span> {{ row[1] }}</p>
+                        <p><span class="history-label">Result:</span> {{ row[2] }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    No search history found yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
