@@ -55,21 +55,7 @@ def home():
             if is_realtime_claim(user_text):
                 result = "Cannot verify live or real-time news"
                 confidence = None
-            else:
-                try:
-                    processed = preprocess_text(user_text)
-                    pred = model.predict(processed)[0][0]
-
-                    if pred >= 0.5:
-                        result = "Likely Real"
-                        confidence = round(float(pred) * 100, 2)
-                    else:
-                        result = "Likely Fake"
-                        confidence = round((1 - float(pred)) * 100, 2)
-
-                except Exception as e:
-                    print(e)
-                    result = "Error while making prediction"
+           
 
     return render_template(
         "index.html",
