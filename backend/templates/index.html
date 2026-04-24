@@ -2,14 +2,53 @@
 <html>
 <head>
     <title>Fake News Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Fake News Detection</h1>
+    <div class="page-wrapper">
+        <div class="card">
+            <div class="topbar">
+                <div class="brand">Fake News Detection</div>
+                <div class="top-links">
+                    <a href="/history">History</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
 
-    <form method="POST" action="/predict">
-        <textarea name="news" rows="8" cols="60" placeholder="Enter news here"></textarea>
-        <br><br>
-        <button type="submit">Check News</button>
-    </form>
+            <div class="content">
+                <h2>Analyze News Text</h2>
+                <p class="subtitle">
+                    Paste a news statement below and let the CNN model predict whether it is real or fake.
+                </p>
+
+                <form action="/" method="POST">
+                    <div class="form-group">
+                        <label for="news">News Content</label>
+                        <textarea id="news" name="news" placeholder="Enter news text here..." required>{{ user_text or "" }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Check News</button>
+                </form>
+
+                {% if result %}
+                <div class="result-box">
+                    <h3>Prediction Result</h3>
+
+                    {% if "Real" in result %}
+                        <span class="badge badge-real">{{ result }}</span>
+                    {% elif "Cannot" in result %}
+                        <span class="badge badge-fake">{{ result }}</span>
+                    {% else %}
+                        <span class="badge badge-fake">{{ result }}</span>
+                    {% endif %}
+
+                    {% if confidence %}
+                        <p class="subtitle">Confidence: {{ confidence }}%</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,43 +1,47 @@
-import os
+from flask import Flask, render_template, request, redirect
+import tensorflow as tf
 import pickle
-import traceback
+import numpy as np
+import os
 
-from flask import Flask, render_template, request, redirect, session
-from tensorflow.keras.models import load_model
-
-
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__)
 app.secret_key = "fake-news-secret-key"
 
+# ----------------------------
+# Load model & tokenizer
+# ----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
 MODEL_PATH = os.path.join(ROOT_DIR, "cnn_model.h5")
 TOKENIZER_PATH = os.path.join(ROOT_DIR, "tokenizer.pkl")
 
-MAX_LEN = 100  # change this only if your training used a different max length
-
-model = load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH)
 
 with open(TOKENIZER_PATH, "rb") as f:
     tokenizer = pickle.load(f)
 
-
+# ----------------------------
+# Preprocessing
+# ----------------------------
 def preprocess_text(text):
-    seq = tokenizer.texts_to_sequences([text])
-    padded = pad_sequences(seq, maxlen=MAX_LEN, padding="post", truncating="post")
+    sequences = tokenizer.texts_to_sequences([text])
+    padded = tf.keras.preprocessing.sequence.pad_sequences(
+        sequences, maxlen=100, padding="post", truncating="post"
+    )
     return padded
 
-
+# ----------------------------
+# Optional: detect real-time claims
+# ----------------------------
 def is_realtime_claim(text):
     text = text.lower()
-    keywords = [
-        "today", "just now", "live", "currently", "won today",
-        "breaking", "latest", "now", "happening now", "this match"
-    ]
+    keywords = ["today", "live", "just now", "breaking", "currently"]
     return any(word in text for word in keywords)
 
-
+# ----------------------------
+# MAIN ROUTE (same page prediction)
+# ----------------------------
 @app.route("/", methods=["GET", "POST"])
 def home():
     result = None
@@ -45,7 +49,7 @@ def home():
     user_text = ""
 
     if request.method == "POST":
-        user_text = request.form.get("news_text", "").strip()
+        user_text = request.form.get("news", "").strip()
 
         if user_text:
             if is_realtime_claim(user_text):
@@ -56,7 +60,6 @@ def home():
                     processed = preprocess_text(user_text)
                     pred = model.predict(processed)[0][0]
 
-                    # adjust this logic if your label mapping is opposite
                     if pred >= 0.5:
                         result = "Likely Real"
                         confidence = round(float(pred) * 100, 2)
@@ -64,9 +67,9 @@ def home():
                         result = "Likely Fake"
                         confidence = round((1 - float(pred)) * 100, 2)
 
-                except Exception:
+                except Exception as e:
+                    print(e)
                     result = "Error while making prediction"
-                    print(traceback.format_exc())
 
     return render_template(
         "index.html",
@@ -75,7 +78,19 @@ def home():
         user_text=user_text
     )
 
+# ----------------------------
+# OPTIONAL ROUTES (to avoid 404 errors)
+# ----------------------------
+@app.route("/history")
+def history():
+    return "History page (you can implement later)"
 
+@app.route("/logout")
+def logout():
+    return redirect("/")
+
+# ----------------------------
+# Run (for local testing)
+# ----------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(debug=True)
